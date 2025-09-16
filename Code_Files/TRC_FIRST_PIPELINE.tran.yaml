@@ -1,0 +1,88 @@
+type: "transformation"
+version: "1.0"
+pipeline:
+  components:
+    CUSTOMERS:
+      type: "table-input"
+      parameters:
+        componentName: "CUSTOMERS"
+        database: "[Environment Default]"
+        schema: "[Environment Default]"
+        targetTable: "CUSTOMERS"
+        columnNames:
+        - "customer_id"
+        - "first_name"
+        - "last_name"
+        - "phone"
+        - "email"
+        - "street"
+        - "city"
+        - "state"
+        - "zip_code"
+        timeOffset:
+    Calculator:
+      type: "calculator"
+      sources:
+      - "CUSTOMERS"
+      parameters:
+        componentName: "Calculator"
+        includeInputColumns: "No"
+        calculations:
+        - - "REPLACE(TRIM(CONCAT(\"first_name\",  \"last_name\"),'\"'),'\"\"',' ')"
+          - "FULL_NAME"
+        - - "TRIM(\"first_name\" , '\"')"
+          - "first_name"
+        - - "TRIM(\"last_name\" , '\"')"
+          - "last_name"
+        - - "TRIM(\"city\" , '\"')"
+          - "city"
+        - - "TRIM(\"state\" , '\"')"
+          - "state"
+        - - "TRIM(\"zip_code\" , '\"')"
+          - "zip_code"
+    Aggregate:
+      type: "aggregate"
+      sources:
+      - "Calculator"
+      parameters:
+        componentName: "Aggregate"
+        groupings:
+        - "state"
+        aggregations:
+        - - "state"
+          - "Count"
+        groupingType: "Group By"
+    Rename:
+      type: "rename"
+      sources:
+      - "Aggregate"
+      parameters:
+        componentName: "Rename"
+        columnMapping:
+        - - "state"
+          - "STATE"
+        - - "count_state"
+          - "TOT_STATE"
+        includeInputColumns: "No"
+design:
+  components:
+    CUSTOMERS:
+      position:
+        x: -930
+        "y": 30
+      tempMetlId: 1
+    Calculator:
+      position:
+        x: -770
+        "y": 30
+      tempMetlId: 2
+    Aggregate:
+      position:
+        x: -610
+        "y": 30
+      tempMetlId: 3
+    Rename:
+      position:
+        x: -450
+        "y": 30
+      tempMetlId: 4
