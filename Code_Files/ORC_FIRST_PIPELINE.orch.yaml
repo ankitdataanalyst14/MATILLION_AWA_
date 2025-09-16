@@ -1,0 +1,180 @@
+type: "orchestration"
+version: "1.0"
+pipeline:
+  components:
+    Start:
+      type: "start"
+      transitions:
+        unconditional:
+        - "Create Table CUSTOMERS"
+      parameters:
+        componentName: "Start"
+    Create Table CUSTOMERS:
+      type: "create-table-v2"
+      transitions:
+        success:
+        - "S3 Load"
+      parameters:
+        componentName: "Create Table CUSTOMERS"
+        createMethod: "Replace"
+        database: "[Environment Default]"
+        schema: "[Environment Default]"
+        table: "CUSTOMERS"
+        snowflakeTableType: "Permanent"
+        columns:
+        - - "customer_id"
+          - "NUMBER"
+          - "15"
+          - ""
+          - ""
+          - "Yes"
+          - "Yes"
+          - " PK"
+          - ""
+        - - "first_name"
+          - "VARCHAR"
+          - "35"
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "last_name"
+          - "VARCHAR"
+          - "35"
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "phone"
+          - "VARCHAR"
+          - "25"
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "email"
+          - "VARCHAR"
+          - "100"
+          - ""
+          - ""
+          - "Yes"
+          - "No"
+          - ""
+          - ""
+        - - "street"
+          - "VARCHAR"
+          - "250"
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "city"
+          - "VARCHAR"
+          - "50"
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "state"
+          - "VARCHAR"
+          - "25"
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        - - "zip_code"
+          - "VARCHAR"
+          - "15"
+          - ""
+          - ""
+          - "No"
+          - "No"
+          - ""
+          - ""
+        defaultDdlCollation:
+        primaryKeys:
+        clusteringKeys:
+        dataRetentionTimeInDays:
+        comment:
+      postProcessing:
+        updateOutputMessage:
+        updateScalarVariables:
+    S3 Load:
+      type: "s3-load"
+      parameters:
+        componentName: "S3 Load"
+        stage: "[Custom]"
+        authentication: "Credentials"
+        s3ObjectPrefix: "s3://awa-matillion/matillion/customers.csv"
+        pattern: ".*"
+        encryption: "S3 Encryption"
+        warehouse: "[Environment Default]"
+        database: "[Environment Default]"
+        schema: "[Environment Default]"
+        targetTable: "CUSTOMERS"
+        loadColumns:
+        - "customer_id"
+        - "first_name"
+        - "last_name"
+        - "phone"
+        - "email"
+        - "street"
+        - "city"
+        - "state"
+        - "zip_code"
+        format: "[Custom]"
+        fileType: "CSV"
+        compression: "AUTO"
+        recordDelimiter:
+        fieldDelimiter: ","
+        skipHeader: "1"
+        skipBlankLines: "True"
+        dateFormat:
+        timeFormat:
+        timestampFormat:
+        escape:
+        escapeUnenclosedField:
+        trimSpace: "False"
+        fieldOptionallyEnclosed:
+        nullIf:
+        errorOnColumnCountMismatch: "True"
+        emptyFieldAsNull: "True"
+        replaceInvalidCharacters: "False"
+        encodingType:
+        onError: "Abort Statement"
+        sizeLimitB:
+        purgeFiles: "False"
+        truncateColumns: "False"
+        forceLoad: "False"
+      postProcessing:
+        updateOutputMessage:
+        updateScalarVariables:
+design:
+  components:
+    Start:
+      position:
+        x: -340
+        "y": 0
+      tempMetlId: 1
+    Create Table CUSTOMERS:
+      position:
+        x: -180
+        "y": 0
+      tempMetlId: 2
+    S3 Load:
+      position:
+        x: -20
+        "y": 0
+      tempMetlId: 3
