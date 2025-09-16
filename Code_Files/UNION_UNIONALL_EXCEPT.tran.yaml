@@ -1,0 +1,148 @@
+type: "transformation"
+version: "1.0"
+pipeline:
+  components:
+    BOOKS1:
+      type: "table-input"
+      parameters:
+        componentName: "BOOKS1"
+        database: "[Environment Default]"
+        schema: "[Environment Default]"
+        targetTable: "BOOKS1"
+        columnNames:
+        - "ID"
+        - "NAME"
+        - "CATEGORY"
+        - "PRICE"
+        timeOffset:
+    BOOKS2:
+      type: "table-input"
+      parameters:
+        componentName: "BOOKS2"
+        database: "[Environment Default]"
+        schema: "[Environment Default]"
+        targetTable: "BOOKS2"
+        columnNames:
+        - "ID"
+        - "NAME"
+        - "CATEGORY"
+        - "PRICE"
+        timeOffset:
+    Except:
+      type: "except"
+      sources:
+      - "BOOKS1"
+      - "BOOKS2"
+      parameters:
+        componentName: "Except"
+        castTypes: "Yes"
+        primaryTable: "BOOKS1"
+    Unite:
+      type: "unite"
+      sources:
+      - "BOOKS2"
+      - "BOOKS1"
+      parameters:
+        componentName: "Unite"
+        method: "All Columns"
+        castTypes: "Yes"
+        addSourceComponentColumn: "Yes"
+        removeDuplicates: "Yes"
+    Rewrite Table BOOKS1_MINUS_BOOKS2:
+      type: "rewrite-table"
+      sources:
+      - "Except"
+      parameters:
+        componentName: "Rewrite Table BOOKS1_MINUS_BOOKS2"
+        warehouse: "[Environment Default]"
+        database: "[Environment Default]"
+        schema: "[Environment Default]"
+        targetTable: "BOOKS1_EXCEPT_BOOKS2"
+        orderBy:
+        - - "ID"
+          - "ASCENDING"
+      postProcessing:
+        updateOutputMessage:
+        updateScalarVariables:
+    Intersect:
+      type: "intersect"
+      sources:
+      - "BOOKS1"
+      - "BOOKS2"
+      parameters:
+        componentName: "Intersect"
+        castTypes: "Yes"
+    Rewrite Table BOOKS1_UNITE_BOOKS2:
+      type: "rewrite-table"
+      sources:
+      - "Unite"
+      parameters:
+        componentName: "Rewrite Table BOOKS1_UNITE_BOOKS2"
+        warehouse: "[Environment Default]"
+        database: "[Environment Default]"
+        schema: "[Environment Default]"
+        targetTable: "BOOKS1_UNITE_BOOKS2"
+        orderBy:
+        - - "ID"
+          - "ASCENDING"
+      postProcessing:
+        updateOutputMessage:
+        updateScalarVariables:
+    Rewrite Table BOOKS1_INTERSECT_BOOKS2:
+      type: "rewrite-table"
+      sources:
+      - "Intersect"
+      parameters:
+        componentName: "Rewrite Table BOOKS1_INTERSECT_BOOKS2"
+        warehouse: "[Environment Default]"
+        database: "[Environment Default]"
+        schema: "[Environment Default]"
+        targetTable: "BOOKS1_INTERSECT_BOOKS2"
+        orderBy:
+        - - "ID"
+          - "ASCENDING"
+      postProcessing:
+        updateOutputMessage:
+        updateScalarVariables:
+design:
+  components:
+    BOOKS1:
+      position:
+        x: -440
+        "y": -20
+      tempMetlId: 1
+    BOOKS2:
+      position:
+        x: -440
+        "y": 200
+      tempMetlId: 2
+    Except:
+      position:
+        x: -280
+        "y": -20
+      tempMetlId: 3
+    Unite:
+      position:
+        x: -280
+        "y": 200
+      tempMetlId: 4
+    Rewrite Table BOOKS1_MINUS_BOOKS2:
+      position:
+        x: -120
+        "y": -20
+      tempMetlId: 5
+    Intersect:
+      position:
+        x: -280
+        "y": 90
+      tempMetlId: 6
+    Rewrite Table BOOKS1_UNITE_BOOKS2:
+      position:
+        x: -120
+        "y": 200
+      tempMetlId: 7
+    Rewrite Table BOOKS1_INTERSECT_BOOKS2:
+      position:
+        x: -120
+        "y": 90
+      tempMetlId: 8
