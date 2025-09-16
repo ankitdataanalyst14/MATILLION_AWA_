@@ -99,23 +99,23 @@ design:
   components:
     'Start ':
       position:
-        x: -432
-        "y": -16
+        x: -430
+        "y": -20
       tempMetlId: 1806
     S3 Load 0:
       position:
-        x: -224
-        "y": -16
+        x: -220
+        "y": -20
       tempMetlId: 1807
     SQL Script 0:
       position:
-        x: -331
-        "y": -18
+        x: -320
+        "y": -20
       tempMetlId: 1949
     Truncate Table 0:
       position:
-        x: -109
-        "y": -15
+        x: -110
+        "y": -20
       tempMetlId: 2054
     Delete Tables 0:
       position:
