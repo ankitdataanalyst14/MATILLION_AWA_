@@ -1,0 +1,86 @@
+type: "orchestration"
+version: "1.0"
+pipeline:
+  components:
+    Start:
+      type: "start"
+      transitions:
+        unconditional:
+        - "SQL Script"
+      parameters:
+        componentName: "Start"
+    SQL Script:
+      type: "sql-executor"
+      transitions:
+        success:
+        - "S3 Load"
+      parameters:
+        componentName: "SQL Script"
+        scriptLocation: "Component"
+        declareSqlVariables: "Include selected"
+        variablesToInclude:
+        sqlScript: "CREATE TABLE TRANSACTIONS\r\ntrans_id INT,\t\r\naccount_id\tINT,\r\
+          \nDate\tDATE,\r\nType\tVARCHAR(30),\r\noperation\tVARCHAR(40),\r\namount\t\
+          INT,\r\nbalance\tFLOAT,\r\nPurpose\tVARCHAR(40),\r\nbank\tVARCHAR(45),\r\
+          \naccount INT;"
+      postProcessing:
+        updateOutputMessage:
+        updateScalarVariables:
+    S3 Load:
+      type: "s3-load"
+      parameters:
+        componentName: "S3 Load"
+        stage: "[Custom]"
+        authentication: "Credentials"
+        s3ObjectPrefix: "s3://awa-matillion/matillion"
+        pattern: ".*\\.csv"
+        encryption: "S3 Encryption"
+        warehouse: "[Environment Default]"
+        database: "[Environment Default]"
+        schema: "[Environment Default]"
+        targetTable:
+        loadColumns:
+        format: "[Custom]"
+        fileType: "CSV"
+        compression: "AUTO"
+        recordDelimiter:
+        fieldDelimiter:
+        skipHeader:
+        skipBlankLines: "False"
+        dateFormat:
+        timeFormat:
+        timestampFormat:
+        escape:
+        escapeUnenclosedField:
+        trimSpace: "False"
+        fieldOptionallyEnclosed:
+        nullIf:
+        errorOnColumnCountMismatch: "False"
+        emptyFieldAsNull: "True"
+        replaceInvalidCharacters: "False"
+        encodingType:
+        onError: "Abort Statement"
+        sizeLimitB:
+        purgeFiles: "False"
+        truncateColumns: "False"
+        forceLoad: "False"
+      postProcessing:
+        updateOutputMessage:
+        updateScalarVariables:
+design:
+  components:
+    Start:
+      position:
+        x: -440
+        "y": 30
+      tempMetlId: 1
+    SQL Script:
+      position:
+        x: -280
+        "y": 30
+      tempMetlId: 2
+    S3 Load:
+      position:
+        x: -120
+        "y": 30
+      tempMetlId: 3
